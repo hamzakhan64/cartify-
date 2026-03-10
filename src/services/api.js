@@ -9,11 +9,12 @@ import axios from 'axios'
 // The base URL comes from your .env file.
 // Create a file called .env in the project root and add:
 //   VITE_API_URL=http://localhost:5000
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || 'https://cartifyserver-eight.vercel.app'
 
 // Create one shared axios instance (used by all service files)
 const api = axios.create({
     baseURL: API_URL,
+    withCredentials: true, // ✅ this is critical — sends cookies/session
     headers: { 'Content-Type': 'application/json' }
 })
 
