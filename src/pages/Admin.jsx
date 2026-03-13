@@ -4,6 +4,7 @@ import { getAdminOrders, updateOrderStatus, getAdminStats } from '../services/or
 
 function Admin() {
     const [activeTab, setActiveTab] = useState('dashboard')
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [products, setProducts] = useState([])
     const [orders, setOrders] = useState([])
     const [stats, setStats] = useState({ totalProducts: 0, totalOrders: 0, totalUsers: 0, revenue: 0 })
@@ -84,15 +85,29 @@ function Admin() {
 
     return (
         <div className="min-h-screen bg-white font-sans flex text-gray-800">
+            {/* Overlay for mobile sidebar */}
+            {isSidebarOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
             {/* SIDEBAR */}
-            <aside className="w-60 bg-gray-50 h-screen sticky top-0 border-r border-gray-100 flex flex-col shrink-0 z-50">
+            <aside className={`fixed md:sticky top-0 left-0 h-screen bg-gray-50 border-r border-gray-100 flex flex-col shrink-0 z-50 w-60 transform transition-transform duration-200 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
                 <div className="p-5 flex items-center gap-2.5">
                     <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white text-sm font-black">C</div>
                     <span className="text-lg font-black tracking-tight text-gray-900">CARTIFY</span>
+                    <button 
+                        className="md:hidden ml-auto text-gray-500 hover:text-gray-900 bg-transparent border-none cursor-pointer"
+                        onClick={() => setIsSidebarOpen(false)}
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
                 </div>
-                <nav className="flex-1 px-3 py-2 space-y-0.5">
+                <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
                     {tabs.map(t => (
-                        <button key={t.id} onClick={() => setActiveTab(t.id)}
+                        <button key={t.id} onClick={() => { setActiveTab(t.id); setIsSidebarOpen(false); }}
                             className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all cursor-pointer border-none ${activeTab === t.id ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-gray-500 hover:bg-white hover:text-gray-700'}`}>
                             {t.icon} {t.label}
                             {t.id === 'orders' && pendingOrders.length > 0 && (
@@ -110,10 +125,18 @@ function Admin() {
             </aside>
 
             {/* MAIN */}
-            <main className="flex-1 flex flex-col h-screen overflow-hidden">
+            <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
                 {/* Topbar */}
-                <header className="h-14 bg-white border-b border-gray-100 px-6 flex items-center justify-between shrink-0">
-                    <h2 className="text-sm font-bold text-gray-900 capitalize">{activeTab}</h2>
+                <header className="h-14 bg-white border-b border-gray-100 px-4 md:px-6 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-3">
+                        <button 
+                            className="md:hidden text-gray-500 hover:text-gray-900 bg-transparent border-none cursor-pointer p-1"
+                            onClick={() => setIsSidebarOpen(true)}
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <h2 className="text-sm font-bold text-gray-900 capitalize">{activeTab}</h2>
+                    </div>
                     <div className="flex items-center gap-4">
                         {/* Notification bell */}
                         <div className="relative">
