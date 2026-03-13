@@ -38,8 +38,8 @@ function Signin() {
     }
 
     return (
-        <div className="min-h-screen flex items-start justify-center p-16 px-8 bg-[#f0f4f8] font-sans">
-            <div className="bg-white border border-gray-200 rounded-[1.25rem] p-10 w-full max-w-[420px] m-auto shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
+        <div className="min-h-screen flex items-start justify-center p-6 sm:p-8 md:p-16 bg-[#f0f4f8] font-sans">
+            <div className="bg-white border border-gray-200 rounded-[1.25rem] p-6 sm:p-10 w-full max-w-[420px] m-auto shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link to="/" className="no-underline block mb-5">
