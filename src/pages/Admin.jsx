@@ -78,6 +78,20 @@ function Admin() {
     const unreadOrders = pendingOrders.filter(o => !readNotifIds.includes(o._id))
     const filteredOrders = orderFilter === 'all' ? orders : orders.filter(o => o.status === orderFilter)
 
+    // Calculate Last 7 Days Sales
+    const salesData = [...Array(7)].map((_, i) => {
+        const d = new Date(); d.setDate(d.getDate() - (6 - i)); d.setHours(0,0,0,0)
+        const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' })
+        const dayOrders = orders.filter(o => {
+            if (o.status === 'cancelled') return false;
+            const od = new Date(o.createdAt);
+            return od.getDate() === d.getDate() && od.getMonth() === d.getMonth() && od.getFullYear() === d.getFullYear();
+        })
+        const total = dayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
+        return { day: dayLabel, total }
+    })
+    const maxSale = Math.max(...salesData.map(s => s.total), 1) // Prevent division by 0
+
     const tabs = [
         { id: 'dashboard', label: 'Dashboard', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> },
         { id: 'products', label: 'Products', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg> },
@@ -208,14 +222,14 @@ function Admin() {
                                 <div className="bg-white p-6 rounded-2xl border border-gray-100">
                                     <h3 className="text-sm font-bold text-gray-900 mb-4">Sales Overview</h3>
                                     <div className="h-48 flex items-end gap-2">
-                                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d, i) => {
-                                            const h = [35, 55, 40, 85, 60, 75, 50][i]
+                                        {salesData.map((d, i) => {
+                                            const h = (d.total / maxSale) * 100
                                             return (
                                                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
                                                     <div className="w-full bg-gray-900 rounded-t-lg transition-all hover:bg-gray-700 cursor-pointer relative group" style={{ height: `${h}%` }}>
-                                                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[0.5rem] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">{h * 12}</span>
+                                                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[0.5rem] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">Rs.{d.total.toLocaleString()}</span>
                                                     </div>
-                                                    <span className="text-[0.55rem] text-gray-400 font-bold">{d}</span>
+                                                    <span className="text-[0.55rem] text-gray-400 font-bold">{d.day}</span>
                                                 </div>
                                             )
                                         })}
