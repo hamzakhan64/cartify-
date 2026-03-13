@@ -274,7 +274,7 @@ function Admin() {
                     {activeTab === 'products' && (
                         <div className="grid grid-cols-1 xl:grid-cols-[380px_1fr] gap-6 items-start">
                             {/* Add/Edit Form */}
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 sticky top-4">
+                            <div className="bg-white p-6 rounded-2xl border border-gray-100 xl:sticky xl:top-4">
                                 <h2 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
                                     <span className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-sm">{editingId ? '✎' : '+'}</span>
                                     {editingId ? 'Edit Product' : 'Add Product'}
