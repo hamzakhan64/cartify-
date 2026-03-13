@@ -18,6 +18,7 @@ function Admin() {
     const [success, setSuccess] = useState('')
     const [orderFilter, setOrderFilter] = useState('all')
     const [showNotif, setShowNotif] = useState(false)
+    const [readNotifIds, setReadNotifIds] = useState([])
 
     useEffect(() => { fetchAllData() }, [])
 
@@ -74,6 +75,7 @@ function Admin() {
     }
 
     const pendingOrders = orders.filter(o => o.status === 'pending')
+    const unreadOrders = pendingOrders.filter(o => !readNotifIds.includes(o._id))
     const filteredOrders = orderFilter === 'all' ? orders : orders.filter(o => o.status === orderFilter)
 
     const tabs = [
@@ -110,8 +112,8 @@ function Admin() {
                         <button key={t.id} onClick={() => { setActiveTab(t.id); setIsSidebarOpen(false); }}
                             className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all cursor-pointer border-none ${activeTab === t.id ? 'bg-white text-gray-900 shadow-sm' : 'bg-transparent text-gray-500 hover:bg-white hover:text-gray-700'}`}>
                             {t.icon} {t.label}
-                            {t.id === 'orders' && pendingOrders.length > 0 && (
-                                <span className="ml-auto bg-red-500 text-white text-[0.6rem] font-bold rounded-full w-5 h-5 flex items-center justify-center">{pendingOrders.length}</span>
+                            {t.id === 'orders' && unreadOrders.length > 0 && (
+                                <span className="ml-auto bg-red-500 text-white text-[0.6rem] font-bold rounded-full w-5 h-5 flex items-center justify-center">{unreadOrders.length}</span>
                             )}
                         </button>
                     ))}
@@ -142,21 +144,25 @@ function Admin() {
                         <div className="relative">
                             <button onClick={() => setShowNotif(!showNotif)} className="relative text-gray-400 hover:text-gray-700 transition-colors cursor-pointer bg-transparent border-none p-1">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                                {pendingOrders.length > 0 && (
-                                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[0.5rem] font-bold rounded-full flex items-center justify-center">{pendingOrders.length}</span>
+                                {unreadOrders.length > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[0.5rem] font-bold rounded-full flex items-center justify-center">{unreadOrders.length}</span>
                                 )}
                             </button>
                             {showNotif && (
                                 <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
                                     <div className="px-4 py-3 border-b border-gray-50 flex justify-between items-center">
                                         <span className="text-sm font-bold text-gray-900">Notifications</span>
-                                        <span className="text-[0.65rem] font-bold text-red-500">{pendingOrders.length} new</span>
+                                        <span className="text-[0.65rem] font-bold text-red-500">{unreadOrders.length} new</span>
                                     </div>
                                     <div className="max-h-64 overflow-y-auto">
-                                        {pendingOrders.length === 0 ? (
+                                        {unreadOrders.length === 0 ? (
                                             <p className="p-4 text-sm text-gray-400 text-center">No new notifications</p>
-                                        ) : pendingOrders.slice(0, 5).map(o => (
-                                            <div key={o._id} onClick={() => { setActiveTab('orders'); setShowNotif(false) }}
+                                        ) : unreadOrders.slice(0, 5).map(o => (
+                                            <div key={o._id} onClick={() => { 
+                                                    setReadNotifIds(prev => [...prev, o._id]);
+                                                    setActiveTab('orders'); 
+                                                    setShowNotif(false); 
+                                                }}
                                                 className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0">
                                                 <p className="text-xs font-bold text-gray-900">New Order #{o._id.slice(-6).toUpperCase()}</p>
                                                 <p className="text-[0.65rem] text-gray-500">Rs.{o.total?.toLocaleString()} • {o.items?.length} items</p>
@@ -171,7 +177,7 @@ function Admin() {
                 </header>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                <div className="flex-1 overflow-y-auto p-3 md:p-6 bg-gray-50">
 
                     {/* ============ DASHBOARD TAB ============ */}
                     {activeTab === 'dashboard' && (
