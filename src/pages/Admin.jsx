@@ -223,11 +223,11 @@ function Admin() {
                                     <h3 className="text-sm font-bold text-gray-900 mb-4">Sales Overview</h3>
                                     <div className="h-48 flex items-end gap-2">
                                         {salesData.map((d, i) => {
-                                            const h = (d.total / maxSale) * 100
+                                            const h = Math.max((d.total / maxSale) * 100, 4) // minimum 4% height
                                             return (
                                                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
                                                     <div className="w-full bg-gray-900 rounded-t-lg transition-all hover:bg-gray-700 cursor-pointer relative group" style={{ height: `${h}%` }}>
-                                                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[0.5rem] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">Rs.{d.total.toLocaleString()}</span>
+                                                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[0.5rem] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">Rs.{d.total.toLocaleString()}</span>
                                                     </div>
                                                     <span className="text-[0.55rem] text-gray-400 font-bold">{d.day}</span>
                                                 </div>
